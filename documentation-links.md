@@ -37,15 +37,11 @@
 
 **Репозиторий:** https://github.com/codegen-sh/codegen/tree/develop/docs
 
-**Всего файлов:** 94 файла (75 MDX документов + примеры кода + изображения)
+**Всего файлов документации:** 69 файлов (2 MD + 67 MDX)
 
 ### Корневая директория /docs
 - README.md - https://github.com/codegen-sh/codegen/blob/develop/docs/README.md
 - self-update.md - https://github.com/codegen-sh/codegen/blob/develop/docs/self-update.md
-- docs.json - https://github.com/codegen-sh/codegen/blob/develop/docs/docs.json
-- favicon.svg - https://github.com/codegen-sh/codegen/blob/develop/docs/favicon.svg
-- prism.css - https://github.com/codegen-sh/codegen/blob/develop/docs/prism.css
-- style.css - https://github.com/codegen-sh/codegen/blob/develop/docs/style.css
 
 ### /agents (Агенты)
 - create-agent-run.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/agents/create-agent-run.mdx
@@ -55,7 +51,6 @@
 - agent-run-logs.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/api-reference/agent-run-logs.mdx
 - authentication.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/api-reference/authentication.mdx
 - github-actions.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/api-reference/github-actions.mdx
-- openapi3.json - https://github.com/codegen-sh/codegen/blob/develop/docs/api-reference/openapi3.json
 - overview.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/api-reference/overview.mdx
 
 ### /capabilities (Возможности)
@@ -100,10 +95,6 @@
 ### /organizations (Организации)
 - get-organizations.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/organizations/get-organizations.mdx
 
-### /samples (Примеры кода)
-- sample.py - https://github.com/codegen-sh/codegen/blob/develop/docs/samples/sample.py
-- sample.tsx - https://github.com/codegen-sh/codegen/blob/develop/docs/samples/sample.tsx
-
 ### /sandboxes (Песочницы)
 - base-image.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/sandboxes/base-image.mdx
 - editor.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/sandboxes/editor.mdx
@@ -121,7 +112,6 @@
 - on-prem-deployment.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/on-prem-deployment.mdx
 - organization-rules.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/organization-rules.mdx
 - repo-rules.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/repo-rules.mdx
-- repo-rules.tsx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/repo-rules.tsx
 - settings.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/settings.mdx
 - team-roles.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/team-roles.mdx
 - trufflehog-integration.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/settings/trufflehog-integration.mdx
@@ -139,71 +129,19 @@
 - get-user.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/users/get-user.mdx
 - get-users.mdx - https://github.com/codegen-sh/codegen/blob/develop/docs/users/get-users.mdx
 
-### /images (Изображения)
-- agent-permissions.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/agent-permissions.png
-- async-await.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/async-await.png
-- blast-radius.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/blast-radius.png
-- codegen-bot-intro.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/codegen-bot-intro.png
-- codegen-thumbnail.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/codegen-thumbnail.png
-- codegen.jpeg - https://github.com/codegen-sh/codegen/blob/develop/docs/images/codegen.jpeg
-- cost-breakdown.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/cost-breakdown.png
-- devin-edits-codemod.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/devin-edits-codemod.png
-- explainer-text.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/explainer-text.png
-- import-loops.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/import-loops.png
-- jira.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/jira.png
-- large-import-loop.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/large-import-loop.png
-- linear.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/linear.png
-- llm-configuration.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/llm-configuration.png
-- mine-amethyst.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/mine-amethyst.png
-- neo4j-call-graph.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/neo4j-call-graph.png
-- neo4j-class-hierarchy.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/neo4j-class-hierarchy.png
-- neo4j-class-methods.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/neo4j-class-methods.png
-- neo4j-function-calls.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/neo4j-function-calls.png
-- nether-portal.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/nether-portal.png
-- problematic-import-loop.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/problematic-import-loop.png
-- python-extensions.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/python-extensions.png
-- repo-rules.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/repo-rules.png
-- sandbox-buttons.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/sandbox-buttons.png
-- set-interpreter.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/set-interpreter.png
-- setup-commands-ui.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/setup-commands-ui.png
-- slack.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/slack.png
-- system-prompt.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/system-prompt.png
-- twilio-diff-after.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/twilio-diff-after.png
-- twilio-diff-before.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/twilio-diff-before.png
-- twilio-then.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/twilio-then.png
-- valid-import-loop.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/valid-import-loop.png
-- voyager-full.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/voyager-full.png
-- voyager-performance.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/voyager-performance.png
-- voyager-retrieval.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/voyager-retrieval.png
-- voyager.png - https://github.com/codegen-sh/codegen/blob/develop/docs/images/voyager.png
-
-### /logo (Логотипы)
-- dark.svg - https://github.com/codegen-sh/codegen/blob/develop/docs/logo/dark.svg
-- light.svg - https://github.com/codegen-sh/codegen/blob/develop/docs/logo/light.svg
-
 ---
 
 ## 3. Linear (Issue tracking and project management)
 
 **Репозиторий:** https://github.com/linear/linear/tree/master/docs
 
-**Всего файлов:** 10 файлов (4 MD документа + вспомогательные файлы)
+**Всего файлов документации:** 4 MD файла
 
 ### Корневая директория /docs
 - API.md - https://github.com/linear/linear/blob/master/docs/API.md
 - Attachments.md - https://github.com/linear/linear/blob/master/docs/Attachments.md
 - OAuth2.md - https://github.com/linear/linear/blob/master/docs/OAuth2.md
 - Webhooks.md - https://github.com/linear/linear/blob/master/docs/Webhooks.md
-- logo.svg - https://github.com/linear/linear/blob/master/docs/logo.svg
-- markdown-magic.config.js - https://github.com/linear/linear/blob/master/docs/markdown-magic.config.js
-
-### /images/webhooks (Изображения для вебхуков)
-- settings-webhooks-new.png - https://github.com/linear/linear/blob/master/docs/images/webhooks/settings-webhooks-new.png
-- settings-webhooks.png - https://github.com/linear/linear/blob/master/docs/images/webhooks/settings-webhooks.png
-
-### /transforms (Трансформации)
-- code-section.js - https://github.com/linear/linear/blob/master/docs/transforms/code-section.js
-- text-section.js - https://github.com/linear/linear/blob/master/docs/transforms/text-section.js
 
 ---
 
@@ -310,11 +248,11 @@
 | Технология | Всего файлов | Формат документов | Репозиторий/Сайт |
 |-----------|--------------|-------------------|------------------|
 | **R2R** | 13 | Markdown (.md) | GitHub (main branch) |
-| **Codegen** | 94 | MDX + примеры кода | GitHub (develop branch) |
-| **Linear** | 10 | Markdown (.md) | GitHub (master branch) |
+| **Codegen** | 69 | Markdown (.md, .mdx) | GitHub (develop branch) |
+| **Linear** | 4 | Markdown (.md) | GitHub (master branch) |
 | **Claude Code** | 55+ | Web-документация | docs.claude.com |
 
-**Итого:** 170+ документов
+**Итого:** 141+ документов (только MD/MDX файлы)
 
 ---
 
