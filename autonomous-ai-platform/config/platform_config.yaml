@@ -1,0 +1,387 @@
+# Autonomous AI Development Platform Configuration
+
+# Platform Settings
+platform:
+  name: "Autonomous Development Platform"
+  version: "0.1.0"
+  environment: "development"  # development | staging | production
+  platform_url: "http://localhost:8000"
+  poll_interval: 30  # seconds between task polling
+  max_parallel_tasks: 10
+
+# R2R Memory System
+r2r:
+  base_url: "http://localhost:7272"
+  timeout: 30
+
+  # Collections for different data types
+  collections:
+    codebase:
+      name: "codebase"
+      description: "Source code and documentation"
+      chunking_strategy: "recursive"
+      chunk_size: 1024
+      overlap: 100
+
+    tasks:
+      name: "tasks"
+      description: "Linear tasks and requirements"
+      chunking_strategy: "semantic"
+      chunk_size: 512
+
+    patterns:
+      name: "patterns"
+      description: "Learned solution patterns"
+      chunking_strategy: "whole_document"
+
+    decisions:
+      name: "decisions"
+      description: "Agent decisions and rationale"
+      chunking_strategy: "semantic"
+      chunk_size: 768
+
+    incidents:
+      name: "incidents"
+      description: "Production incidents and root causes"
+      chunking_strategy: "semantic"
+      chunk_size: 512
+
+    metrics:
+      name: "metrics"
+      description: "Platform metrics and performance data"
+      chunking_strategy: "time_series"
+
+  # GraphRAG Configuration
+  graphrag:
+    enabled: true
+    extraction_model: "gpt-4-turbo"
+    embedding_model: "text-embedding-3-large"
+    entity_types:
+      - CodeModule
+      - Task
+      - Decision
+      - Pattern
+      - Bug
+    relationship_types:
+      - DEPENDS_ON
+      - IMPLEMENTS
+      - CAUSED_BY
+      - SIMILAR_TO
+      - REVIEWED_BY
+      - CALLS
+      - IMPORTS
+
+# Agent Configuration
+agents:
+  architect:
+    thinking_budget_tokens: 8000
+    max_complexity: 10.0
+    can_handle_task_types:
+      - feature
+      - architecture
+      - design
+    requires_tools:
+      - memory
+      - github
+
+  developer:
+    thinking_budget_tokens: 4000
+    max_complexity: 8.0
+    can_handle_task_types:
+      - implementation
+      - bug
+      - refactor
+    requires_tools:
+      - memory
+      - github
+      - codegen
+
+  tester:
+    thinking_budget_tokens: 4000
+    max_complexity: 6.0
+    can_handle_task_types:
+      - testing
+      - qa
+    requires_tools:
+      - codegen
+      - memory
+
+  reviewer:
+    thinking_budget_tokens: 4000
+    max_complexity: 7.0
+    can_handle_task_types:
+      - review
+      - quality
+    requires_tools:
+      - memory
+      - github
+
+  deployer:
+    thinking_budget_tokens: 2000
+    max_complexity: 5.0
+    can_handle_task_types:
+      - deployment
+    requires_tools:
+      - github
+      - monitoring
+
+  monitor:
+    thinking_budget_tokens: 4000
+    max_complexity: 8.0
+    can_handle_task_types:
+      - monitoring
+      - incident
+    requires_tools:
+      - monitoring
+      - memory
+
+# Decision Engine Configuration
+decision_engine:
+  # Auto-deployment thresholds
+  auto_deploy_threshold: 0.8  # Minimum confidence for auto-deploy
+  risk_threshold_high: 0.5    # Above this requires review
+  risk_threshold_critical: 0.8 # Above this is blocked
+
+  # Risk weights for multi-factor assessment
+  risk_weights:
+    complexity: 0.2
+    coverage: 0.3
+    dependencies: 0.2
+    stability: 0.15
+    impact: 0.15
+
+  # Escalation rules
+  escalation_rules:
+    immediate:
+      - security_vulnerability_detected
+      - production_outage
+      - data_loss_risk
+      - legal_compliance_issue
+
+    high_priority:
+      - test_failure_rate > 20%
+      - deployment_risk_score > 0.8
+      - breaking_api_changes
+      - performance_degradation > 50%
+
+    standard:
+      - code_review_disagreement
+      - architectural_decision_needed
+      - unfamiliar_technology_stack
+      - edge_case_uncertainty
+
+  # Confidence calibration
+  calibration:
+    enabled: true
+    min_samples: 10  # Minimum samples before trusting calibration
+    conservative_factor: 0.8  # Multiply confidence when lacking data
+
+# Learning System Configuration
+learning:
+  # Pattern extraction
+  pattern_threshold: 0.7  # Minimum quality score to extract pattern
+  pattern_similarity_threshold: 0.85  # Similarity to merge patterns
+
+  # Reinforcement learning
+  learning_rate: 0.01
+  discount_factor: 0.95
+
+  # Memory management
+  memory_decay_rate: 0.05  # Rate at which old patterns decay
+  memory_decay_period_days: 90  # Half-life for pattern relevance
+
+  # Meta-learning
+  meta_learning_enabled: true
+  hyperparameter_tuning_interval_hours: 24
+
+  # Transfer learning
+  transfer_learning_enabled: true
+  transfer_discount: 0.8  # Discount for transferred patterns
+
+# Integration Configuration
+integrations:
+  # Linear (Task Management)
+  linear:
+    api_key: "${LINEAR_API_KEY}"
+    webhook_secret: "${LINEAR_WEBHOOK_SECRET}"
+    team_id: null  # Optional: specific team
+    poll_interval: 30
+    max_tasks_per_poll: 10
+    task_filters:
+      state: "Backlog"
+      assignee_null: true
+      priority_gte: 2
+
+  # GitHub (Code Repository)
+  github:
+    token: "${GITHUB_TOKEN}"
+    repo: "owner/repo"
+    default_branch: "main"
+    auto_merge_enabled: true
+    auto_merge_conditions:
+      min_confidence: 0.9
+      tests_passing: true
+      reviews_approved: 1
+
+  # Codegen (Sandbox Execution)
+  codegen:
+    api_key: "${CODEGEN_API_KEY}"
+    default_template: "node18-python311"
+    sandbox_ttl: 3600  # 1 hour
+    persistent_sandboxes: true
+    max_concurrent_sandboxes: 5
+    preinstall_commands:
+      - "npm install"
+      - "pip install -r requirements.txt"
+
+  # Redis (Event Bus)
+  redis:
+    url: "${REDIS_URL:redis://localhost:6379}"
+    db: 0
+    max_connections: 10
+    task_lock_ttl: 300  # 5 minutes
+
+  # Monitoring (Optional)
+  monitoring:
+    provider: "datadog"  # datadog | prometheus | custom
+    api_key: "${MONITORING_API_KEY}"
+    enabled: true
+
+# Metrics & Observability
+metrics:
+  collection_interval: 60  # seconds
+  retention_days: 90
+
+  # Metrics to track
+  track:
+    - tasks_completed
+    - tasks_failed
+    - deployment_success_rate
+    - deployment_frequency
+    - mean_time_to_resolution
+    - code_quality_score
+    - test_coverage
+    - incident_rate
+    - agent_utilization
+    - memory_retrieval_latency
+    - memory_retrieval_precision
+    - pattern_reuse_rate
+    - decision_confidence
+    - learning_progress
+
+  # Alerting thresholds
+  alerts:
+    deployment_failure_rate_threshold: 0.1  # Alert if > 10%
+    incident_rate_threshold: 0.05
+    agent_failure_threshold: 3  # failures per hour
+    memory_latency_threshold_ms: 500
+
+# Experiment Configuration
+experiments:
+  enabled: true
+  log_level: "INFO"
+
+  # Memory architecture experiment
+  memory_architecture:
+    num_scenarios: 100
+    architectures:
+      - centralized
+      - distributed
+      - hybrid
+
+  # Reasoning strategy experiment
+  reasoning_strategies:
+    num_tasks: 50
+    strategies:
+      - sequential
+      - parallel
+      - hierarchical
+      - emergent
+
+  # Learning mechanism experiment
+  learning_mechanisms:
+    phases:
+      - tasks: 50
+        name: "initial"
+      - tasks: 100
+        name: "early"
+      - tasks: 200
+        name: "mature"
+
+  # Auto-deployment experiment
+  auto_deployment:
+    num_scenarios: 100
+    failure_simulation_rate: 0.3
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  handlers:
+    console:
+      enabled: true
+
+    file:
+      enabled: true
+      path: "logs/platform.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+
+    r2r:
+      enabled: true  # Store logs in R2R for analysis
+      collection: "logs"
+
+# Security
+security:
+  # API authentication
+  require_api_key: true
+  api_key_header: "X-API-Key"
+
+  # Webhook signature verification
+  verify_webhook_signatures: true
+
+  # Secrets management
+  secrets_provider: "environment"  # environment | aws_secrets | vault
+
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+
+  # Sandboxing
+  sandbox_isolation: true
+  sandbox_network_isolation: true
+
+# Performance Tuning
+performance:
+  # Parallelization
+  max_concurrent_agents: 10
+  max_concurrent_tasks_per_agent: 1
+
+  # Caching
+  cache_enabled: true
+  cache_ttl: 3600
+
+  # Database connection pooling
+  db_pool_size: 20
+  db_pool_timeout: 30
+
+  # Memory optimization
+  memory_sharding_enabled: true
+  memory_shards: 4
+
+# Development Settings
+development:
+  debug_mode: true
+  verbose_logging: true
+  simulate_delays: false
+  mock_external_services: false
+
+  # Testing
+  test_mode: false
+  test_data_path: "tests/data"
+
+  # Local overrides
+  use_local_models: false
+  local_model_path: "models/"

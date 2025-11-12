@@ -1,0 +1,205 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: autonomous-platform-postgres
+    environment:
+      POSTGRES_USER: autonomous
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autonomous_dev}
+      POSTGRES_DB: autonomous_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autonomous"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - autonomous-network
+
+  # Redis (Event Bus)
+  redis:
+    image: redis:7-alpine
+    container_name: autonomous-platform-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_dev}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - autonomous-network
+
+  # R2R (RAG System with GraphRAG)
+  r2r:
+    image: sciphi/r2r:latest
+    container_name: autonomous-platform-r2r
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: autonomous
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autonomous_dev}
+      POSTGRES_DBNAME: r2r
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "7272:7272"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - r2r_data:/app/data
+    networks:
+      - autonomous-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7272/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Autonomous Platform
+  platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autonomous-platform
+    environment:
+      # R2R
+      R2R_URL: http://r2r:7272
+
+      # Redis
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_dev}@redis:6379/0
+
+      # Database
+      DATABASE_URL: postgresql://autonomous:${POSTGRES_PASSWORD:-autonomous_dev}@postgres:5432/autonomous_platform
+
+      # API Keys
+      LINEAR_API_KEY: ${LINEAR_API_KEY}
+      LINEAR_WEBHOOK_SECRET: ${LINEAR_WEBHOOK_SECRET}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      CODEGEN_API_KEY: ${CODEGEN_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+
+      # Platform
+      PLATFORM_URL: ${PLATFORM_URL:-http://localhost:8000}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      r2r:
+        condition: service_healthy
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+      - platform_data:/app/data
+    networks:
+      - autonomous-network
+    restart: unless-stopped
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: autonomous-platform-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - autonomous-network
+    restart: unless-stopped
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: autonomous-platform-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - autonomous-network
+    restart: unless-stopped
+
+  # Redis Commander (Optional - for debugging)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: autonomous-platform-redis-commander
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:${REDIS_PASSWORD:-redis_dev}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - autonomous-network
+    profiles:
+      - debug
+
+  # pgAdmin (Optional - for debugging)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: autonomous-platform-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@autonomous.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "8082:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - autonomous-network
+    profiles:
+      - debug
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  r2r_data:
+    driver: local
+  platform_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  autonomous-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
