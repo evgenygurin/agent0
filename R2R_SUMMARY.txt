@@ -1,0 +1,464 @@
+================================================================================
+R2R: COMPREHENSIVE DEPLOYMENT & ARCHITECTURE REPORT
+================================================================================
+
+PROJECT: agent0
+DATE: 2024-11-12
+SOURCE: /Users/laptop/dev/agent0/docs/r2r/
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+R2R (RAG to Riches) is an advanced, production-ready AI retrieval system built
+by SciPhi-AI for Retrieval-Augmented Generation (RAG) applications. It provides
+a complete RESTful API for document management, semantic search, and AI-powered
+question answering with enterprise-grade features.
+
+GITHUB: https://github.com/SciPhi-AI/R2R
+DOCS: https://r2r-docs.sciphi.ai/
+VERSION: 3.6.5+ (latest)
+LICENSE: MIT (Open Source)
+STARS: 7.4k+ on GitHub
+
+================================================================================
+1. WHAT IS R2R?
+================================================================================
+
+Core Purpose:
+  - Retrieval-Augmented Generation (RAG) framework for document understanding
+  - Agentic RAG with multi-step reasoning and web search
+  - Production-ready REST API for enterprise applications
+  - Multimodal document ingestion (PDF, TXT, JSON, PNG, MP3, DOCX, PPTX)
+
+Key Capabilities:
+  [✓] Semantic & Hybrid Search (vector + full-text with RRF)
+  [✓] Knowledge Graphs (automatic entity & relationship extraction)
+  [✓] Agentic RAG (deep research with tool use and reasoning)
+  [✓] Document Management (complete lifecycle with versioning)
+  [✓] User & Access Control (authentication + collections)
+  [✓] Web Integration (web search and scraping)
+  [✓] Streaming Responses (real-time SSE support)
+  [✓] Citations & Attribution (source tracking)
+
+================================================================================
+2. CORE COMPONENTS & PORTS
+================================================================================
+
+Component              Port    Type      Purpose
+─────────────────────────────────────────────────────────────────────────────
+R2R REST API           7272    HTTP/WS   Main API endpoint
+PostgreSQL Database    5432    TCP       Metadata & embeddings
+Redis Cache            6379    TCP       Performance optimization (optional)
+PgAdmin                5050    HTTP      Database management (dev only)
+
+================================================================================
+3. SYSTEM ARCHITECTURE
+================================================================================
+
+┌──────────────────────────────────────────────────────────────┐
+│               R2R REST API (Port 7272)                       │
+│           FastAPI Application (Python 3.12+)                │
+└──────────────────────────────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+    PostgreSQL        Vector Database      LLM Providers
+    (Metadata)        (pgvector/HNSW)     (OpenAI, Claude)
+    │ Documents        │ Embeddings         │ Generation
+    │ Chunks          │ Similarity Search   │ Reasoning
+    │ Users           │ Index Management    │ Tool Use
+    │ Collections     │
+    │
+└─ Redis (Cache/Sessions)
+└─ Search Engine (Full-text)
+└─ External APIs (Serper, Firecrawl)
+
+================================================================================
+4. DEPLOYMENT OPTIONS
+================================================================================
+
+OPTION A: Light Mode (Development)
+──────────────────────────────────
+Command: export OPENAI_API_KEY=sk-...; r2r
+Features: In-memory SQLite, minimal dependencies
+Use Case: Prototyping, development
+Requirements: Python 3.12+, OpenAI API key
+
+OPTION B: Full Mode with Docker Compose (RECOMMENDED)
+──────────────────────────────────────────────────────
+Repository: https://github.com/SciPhi-AI/R2R.git
+Files: compose.full.yaml (production), compose.light.yaml (dev)
+Command:
+  git clone https://github.com/SciPhi-AI/R2R.git && cd R2R
+  export R2R_CONFIG_NAME=full
+  export OPENAI_API_KEY=sk-...
+  export POSTGRES_PASSWORD=secure_password
+  docker compose -f compose.full.yaml --profile postgres up -d
+
+Services Included:
+  - r2r-api (Python FastAPI application)
+  - postgres (Database with pgvector extension)
+  - redis (Cache layer)
+  - pgadmin (DB management - optional)
+
+OPTION C: Kubernetes (Enterprise Scale)
+────────────────────────────────────────
+Location: deployment/k8s/ in R2R repository
+Includes: StatefulSets, Services, ConfigMaps
+Scaling: Horizontal pod autoscaling support
+
+================================================================================
+5. EXTERNAL DEPENDENCIES
+================================================================================
+
+REQUIRED:
+  1. Python 3.12+ (for R2R core)
+  2. Docker & Docker Compose (for containerized deployment)
+  3. PostgreSQL 14+ (for full mode)
+  4. LLM API Keys (at least one):
+     - OPENAI_API_KEY (OpenAI models)
+     - ANTHROPIC_API_KEY (Claude models)
+     - AZURE_OPENAI_API_KEY (Azure models)
+
+OPTIONAL:
+  1. Redis 7+ (for caching & distributed deployment)
+  2. Serper API Key (for web search in agentic RAG)
+  3. Firecrawl API Key (for web scraping)
+  4. PostgreSQL Extensions:
+     - pgvector (already installed in R2R Docker image)
+     - Full-text search (built-in to PostgreSQL)
+
+================================================================================
+6. ENVIRONMENT VARIABLES
+================================================================================
+
+CORE:
+  R2R_CONFIG_NAME=full              # "light" or "full"
+  R2R_LOG_LEVEL=INFO                # DEBUG, INFO, WARNING, ERROR
+  R2R_PORT=7272                      # API port
+  R2R_HOST=0.0.0.0                  # Bind address
+
+DATABASE:
+  DATABASE_URL=postgresql://user:pass@localhost:5432/r2r
+  POSTGRES_USER=r2r_user
+  POSTGRES_PASSWORD=secure_password
+  POSTGRES_DB=r2r_db
+
+LLM PROVIDERS:
+  OPENAI_API_KEY=sk-...
+  ANTHROPIC_API_KEY=sk-ant-...
+  AZURE_OPENAI_API_KEY=...
+  AZURE_OPENAI_ENDPOINT=https://...
+
+EXTERNAL SERVICES:
+  SERPER_API_KEY=...                # Web search
+  FIRECRAWL_API_KEY=...             # Web scraping
+
+REDIS:
+  REDIS_HOST=redis
+  REDIS_PORT=6379
+
+SECURITY:
+  JWT_SECRET_KEY=your-secret-key
+  JWT_ALGORITHM=HS256
+
+================================================================================
+7. DOCKER COMPOSE QUICK START
+================================================================================
+
+Step 1: Clone Repository
+  git clone https://github.com/SciPhi-AI/R2R.git
+  cd R2R
+
+Step 2: Create .env File
+  cp .env.example .env
+  # Edit with your API keys and passwords
+
+Step 3: Start Services
+  export R2R_CONFIG_NAME=full
+  export OPENAI_API_KEY=sk-your-key
+  export POSTGRES_PASSWORD=your-password
+  docker compose -f compose.full.yaml --profile postgres up -d
+
+Step 4: Verify Installation
+  curl http://localhost:7272/v3/health
+
+Step 5: Install SDKs
+  pip install r2r           # Python
+  npm install r2r-js        # JavaScript
+
+Step 6: Test Basic Operation
+  from r2r import R2RClient
+  client = R2RClient(base_url="http://localhost:7272")
+  response = client.documents.create_sample(hi_res=True)
+  results = client.retrieval.search(query="What is AI?")
+  answer = client.retrieval.rag(query="What is AI?")
+
+================================================================================
+8. KEY FEATURES BY DOMAIN
+================================================================================
+
+DOCUMENT INGESTION:
+  - Format Support: PDF, TXT, JSON, PNG, MP3, DOCX, PPTX
+  - Processing: Auto chunking, embedding generation, summarization
+  - Metadata: Version control, collection assignment, tracking
+
+SEARCH CAPABILITIES:
+  - Basic Mode: Simple semantic search (vector similarity)
+  - Advanced Mode: Hybrid search (semantic + full-text with RRF)
+  - Custom Mode: Fine-grained control via search_settings
+  - Distance Metrics: cosine (default), l2, max_inner_product, l1, hamming
+
+RETRIEVAL-AUGMENTED GENERATION:
+  - Semantic Search: Vector-based retrieval
+  - Hybrid Search: Combined keyword & semantic
+  - Knowledge Graphs: Entity/relationship search
+  - Citations: Automatic source attribution
+  - Web Search: Real-time information integration
+  - Streaming: SSE support for real-time responses
+
+AGENTIC RAG (DEEP RESEARCH):
+  - Multi-step Reasoning: Complex problem decomposition
+  - Tool Usage: Search documents, scrape web, execute code
+  - Conversation Memory: Multi-turn dialogue support
+  - Extended Thinking: Claude 3.7 with reasoning budget
+  - Web Integration: Real-time internet access
+
+USER MANAGEMENT:
+  - Authentication: Email/password, API keys
+  - Collections: Document organization by user/project
+  - Permissions: Fine-grained access control
+  - Audit: Track API usage and modifications
+
+================================================================================
+9. PRODUCTION DEPLOYMENT CHECKLIST
+================================================================================
+
+INFRASTRUCTURE:
+  [ ] PostgreSQL 14+ database initialized with pgvector
+  [ ] Redis configured (if using distributed mode)
+  [ ] Docker images pulled and cached locally
+  [ ] Networks configured for inter-container communication
+  [ ] Volumes created for persistent data (PostgreSQL)
+  [ ] Health checks configured for all services
+
+SECURITY:
+  [ ] All API keys stored in environment variables (not in code)
+  [ ] JWT secret key generated and secured
+  [ ] Database password changed from default
+  [ ] Firewall rules configured (restrict port access)
+  [ ] HTTPS/TLS configured for production
+  [ ] Authentication enabled for API access
+
+OPERATIONS:
+  [ ] Logging aggregation setup (ELK, CloudWatch, etc.)
+  [ ] Monitoring & alerting configured (Prometheus, Grafana)
+  [ ] Backup strategy for PostgreSQL database
+  [ ] Database connection pooling configured
+  [ ] Load balancer configured (if multi-instance)
+  [ ] Resource limits set for containers
+
+TESTING:
+  [ ] Health check endpoint verified
+  [ ] Document ingestion tested
+  [ ] Search functionality tested
+  [ ] RAG generation tested with sample queries
+  [ ] Authentication tested
+  [ ] Error handling verified
+
+================================================================================
+10. QUICK REFERENCE: PYTHON SDK
+================================================================================
+
+# Installation
+pip install r2r
+
+# Initialize Client
+from r2r import R2RClient
+client = R2RClient(base_url="http://localhost:7272")
+
+# Document Operations
+client.documents.create_sample(hi_res=True)
+client.documents.create(file_path="/path/to/file.pdf")
+client.documents.list()
+client.documents.get(document_id="doc-id")
+client.documents.delete(document_id="doc-id")
+
+# Search
+client.retrieval.search(query="What is AI?")
+client.retrieval.search(
+    query="machine learning",
+    search_settings={"use_hybrid_search": True}
+)
+
+# RAG
+client.retrieval.rag(query="Explain neural networks")
+
+# Streaming RAG
+stream = client.retrieval.rag(
+    query="What is deep learning?",
+    rag_generation_config={"stream": True}
+)
+for event in stream:
+    print(event)
+
+# Agentic RAG
+response = client.retrieval.agent(
+    message={"role": "user", "content": "Research AI trends"},
+    rag_generation_config={"model": "anthropic/claude-3-7-sonnet-20250219"}
+)
+
+# Collections
+collection = client.collections.create(name="my-collection")
+client.documents.update(
+    document_id="doc-id",
+    collection_ids=[collection.id]
+)
+
+# Conversations
+conversation = client.conversations.create(name="chat")
+client.retrieval.rag(
+    query="Follow-up question",
+    conversation_id=conversation.id
+)
+
+================================================================================
+11. TROUBLESHOOTING
+================================================================================
+
+Issue: Port 7272 already in use
+Solution: Change port in compose file or use: lsof -i :7272; kill -9 <PID>
+
+Issue: PostgreSQL connection failed
+Solution: 
+  docker ps | grep postgres
+  docker logs r2r-postgres
+  Verify POSTGRES_PASSWORD matches DATABASE_URL
+
+Issue: OpenAI API key not recognized
+Solution:
+  echo $OPENAI_API_KEY
+  docker compose restart r2r
+  Check .env file has correct format
+
+Issue: Out of memory during ingestion
+Solution:
+  Increase Docker memory limits
+  Use smaller chunk sizes
+  Ingest documents in batches
+
+Issue: Slow search performance
+Solution:
+  Increase Redis caching
+  Tune PostgreSQL pool connections
+  Check pgvector index creation progress
+
+================================================================================
+12. MONITORING & HEALTH CHECKS
+================================================================================
+
+Health Endpoint:
+  curl http://localhost:7272/v3/health
+
+Returns:
+  {
+    "status": "healthy",
+    "version": "3.6.5",
+    "postgres": "connected",
+    "redis": "connected",
+    "timestamp": "2024-11-12T10:30:00Z"
+  }
+
+Available Metrics:
+  - API response times
+  - Document ingestion status
+  - Search latency
+  - Vector database health
+  - LLM provider connectivity
+  - Database connection pool stats
+
+Logs:
+  docker compose logs -f r2r
+  docker compose logs -f postgres
+  docker compose logs -f redis
+
+================================================================================
+13. USEFUL RESOURCES
+================================================================================
+
+Official Documentation: https://r2r-docs.sciphi.ai/
+GitHub Repository:    https://github.com/SciPhi-AI/R2R
+Discord Community:    https://discord.gg/p6KqD2kjtB
+Python SDK:           https://pypi.org/project/r2r/
+JavaScript SDK:       https://www.npmjs.com/package/r2r-js
+API Reference:        https://r2r-docs.sciphi.ai/api-and-sdks
+Self-Hosting Guide:   https://r2r-docs.sciphi.ai/self-hosting
+Cookbooks:            https://r2r-docs.sciphi.ai/cookbooks
+
+================================================================================
+14. SUMMARY TABLE
+================================================================================
+
+Feature              Value
+────────────────────────────────────────────────────────────────
+Type                 Production-ready RAG system
+Language             Python 3.12+ (Core), JavaScript (SDK)
+API                  RESTful with WebSocket streaming (Port 7272)
+Database             PostgreSQL 14+ with pgvector extension
+Cache                Redis 7+ (optional)
+Search Types         Semantic, Full-text, Hybrid, Graph
+LLM Support          OpenAI, Anthropic, Azure, Custom (via LiteLLM)
+Deployment           Docker Compose, Kubernetes, Local
+Special Features     Agentic RAG, Web Search, Code Execution
+Document Formats     PDF, TXT, JSON, PNG, MP3, DOCX, PPTX
+License              MIT (Open Source)
+Community            Active Discord + GitHub
+
+================================================================================
+15. NEXT STEPS FOR DEPLOYMENT
+================================================================================
+
+1. Clone R2R repository
+   git clone https://github.com/SciPhi-AI/R2R.git
+
+2. Prepare environment variables (.env file)
+   - OPENAI_API_KEY or ANTHROPIC_API_KEY
+   - POSTGRES_PASSWORD
+   - JWT_SECRET_KEY
+
+3. Start Docker Compose
+   docker compose -f compose.full.yaml --profile postgres up -d
+
+4. Verify services are running
+   docker ps
+   curl http://localhost:7272/v3/health
+
+5. Install Python/JavaScript SDKs
+   pip install r2r
+   npm install r2r-js
+
+6. Test with sample document
+   Create test script with R2RClient
+   Ingest sample PDF
+   Run search and RAG queries
+
+7. Implement your application
+   Use provided SDKs to build RAG application
+   Configure collections and user management
+   Set up monitoring and logging
+
+8. Monitor and maintain
+   Check health endpoint regularly
+   Monitor PostgreSQL performance
+   Back up database regularly
+   Update R2R image periodically
+
+================================================================================
+
+GENERATED: 2024-11-12
+COMPILED FROM: R2R Official Documentation
+SOURCE LOCATION: /Users/laptop/dev/agent0/docs/r2r/
+
+For questions, visit: https://discord.gg/p6KqD2kjtB
+================================================================================
