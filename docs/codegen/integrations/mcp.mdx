@@ -1,0 +1,107 @@
+---
+title: "Remote MCP Server"
+description: "Connect AI agents to Codegen using the hosted Model Context Protocol (MCP) server"
+icon: "server"
+---
+
+Codegen provides a hosted MCP server that allows AI agents to interact with the Codegen platform through the Model Context Protocol (MCP). This integration enables AI agents to access Codegen APIs, manage agent runs, and interact with your development workflow without running a local server.
+
+## Overview
+
+The remote MCP server provides:
+
+- **Cloud-Based Integration**: Access Codegen services from anywhere without local setup
+- **API Integration**: Direct access to Codegen platform APIs
+- **Agent Management**: Create and monitor agent runs
+- **Organization Management**: Access organization and user information
+- **Workflow Integration**: Seamless integration with AI development tools
+
+## Configuration
+
+### For Claude Code
+
+To configure the remote Codegen MCP server in Claude Code:
+
+```bash
+claude mcp add --transport http codegen-tools https://mcp.codegen.com/mcp/ \
+  --header "Authorization: Bearer <auth token>" \
+  --header "x-organization-id: <org-id>" \
+  --header "x-repo-id: <repo-id>"
+```
+
+Replace:
+
+- `<auth token>` with your Codegen API key
+- `<org-id>` with your organization ID (optional, automatically added when using `codegen claude`)
+- `<repo-id>` with your repository ID (optional, automatically added when using `codegen claude`)
+
+### For Cursor/Windsurf/VSCode Forks
+
+Add the following configuration to your settings:
+
+```json
+{
+  "mcp.servers": {
+    "codegen-remote": {
+      "transport": "http",
+      "url": "https://mcp.codegen.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer <auth token>",
+        "x-organization-id": "<org-id>",
+        "x-repo-id": "<repo-id>"
+      }
+    }
+  }
+}
+```
+
+Replace:
+
+- `<auth token>` with your Codegen API key
+- `<org-id>` with your organization ID (optional)
+- `<repo-id>` with your repository ID (optional)
+
+### For VSCode with MCP Extension
+
+If you're using VSCode with an MCP extension, add this to your settings.json:
+
+```json
+{
+  "mcp.servers": [
+    {
+      "name": "codegen-remote",
+      "transport": "http",
+      "url": "https://mcp.codegen.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer <auth token>",
+        "x-organization-id": "<org-id>",
+        "x-repo-id": "<repo-id>"
+      }
+    }
+  ]
+}
+```
+
+Replace:
+
+- `<auth token>` with your Codegen API key
+- `<org-id>` with your organization ID (optional)
+- `<repo-id>` with your repository ID (optional)
+
+## Authentication
+
+The remote MCP server uses your Codegen API key for authentication. You can obtain your API key from the [Codegen dashboard](https://codegen.com/settings).
+
+## Available Tools
+
+The remote MCP server provides the following tools for AI agents:
+
+### Getting Help
+
+If you encounter issues with the remote MCP server:
+
+1. Check the [Codegen documentation](https://docs.codegen.com)
+2. Join our [community Slack](https://community.codegen.com)
+3. Report issues on [GitHub](https://github.com/codegen-sh/codegen)
+
+The remote MCP server makes it easy to integrate Codegen's powerful AI development capabilities into your existing AI agent workflows without the need to run a local server.
